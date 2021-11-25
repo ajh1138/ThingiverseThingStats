@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Thingiverse Thing Stats",
+  "short_name": "Thing Stats",
+  "version": "0.01.01",
+  "description": "Shows additional \"hidden\" stats on a Thing's page.",
+  "author": "ajh1138@gmail.com",
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": [
+    "webRequest",
+    "identity",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "*://*.thingiverse.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.thingiverse.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {}
+}
