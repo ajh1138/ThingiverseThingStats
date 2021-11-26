@@ -12,8 +12,7 @@
     "128": "icon128.png"
   },
   "permissions": [
-    "webRequest",
-    "webNavigation"
+    "webRequest"
   ],
   "host_permissions": [
     "*://*.thingiverse.com/*"

@@ -1,11 +1,18 @@
 let token = "";
-let thingId = "";
 
-chrome.webNavigation.onCompleted.addListener(function (details) {
-	if (details.frameId == 0) {
-		getThingIdFromUrl();
+chrome.runtime.onMessage.addListener(
+	function (request, sender, sendResponse) {
+		var thingId = request.thingId;
+
+		if (thingId != null && thingId != undefined && thingId != "") {
+			getThingDetails(thingId);
+			sendResponse({ farewell: "bg received the thingId" });
+		} else {
+			sendResponse({ farewell: "bg received something but it wasn't the thingId" });
+		}
+
 	}
-}, { url: [{ urlPrefix: "https://www.thingiverse.com/thing:" }] });
+);
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	function (details) {
@@ -16,19 +23,9 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 		}
 	}, { urls: ["*://api.thingiverse.com/things/*"], types: ["xmlhttprequest"] }, ["requestHeaders"]);
 
-getThingIdFromUrl = () => {
-	chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
-		let url = new URL(tabs[0].url);
-		let dirs = url.pathname.split("/");
-		let parts = dirs[1].split(":");
 
-		thingId = parts[1];
 
-		getThingDetails();
-	});
-}
-
-getThingDetails = () => {
+getThingDetails = (thingId) => {
 	let url = `https://api.thingiverse.com/things/${thingId}`;
 
 	fetch(url,
