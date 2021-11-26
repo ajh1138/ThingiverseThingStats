@@ -13,7 +13,6 @@ window.onload = function () {
 chrome.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
 		var thingDetails = request.details;
-		console.log("thingDetails", thingDetails);
 
 		if (thingDetails != null && thingDetails != undefined && thingDetails != "") {
 			sendResponse({ farewell: "content received thing details" });
@@ -26,17 +25,16 @@ chrome.runtime.onMessage.addListener(
 
 getThingId = () => {
 	var url = new URL(document.head.querySelector("meta[property='og:url']").content);
-	console.log("url grabbed: ", url);
+
 	let dirs = url.pathname.split("/");
 	let parts = dirs[1].split(":");
 
 	var thingId = parts[1];
-	console.log("thingId grabbed.", thingId);
+
 	return thingId;
 }
 
 sendThingIdToBackgroundScript = (thingId) => {
-	console.log("sending id to bg: ", thingId);
 	chrome.runtime.sendMessage({ thingId: thingId }, function (response) {
 		console.log(response.farewell);
 	});
@@ -44,14 +42,12 @@ sendThingIdToBackgroundScript = (thingId) => {
 
 showThingDetails = (thingDetails) => {
 	let sideButtons = document.getElementsByClassName("SideMenuItem__itemContainer--2VO4t");
-	console.log("side buttons", sideButtons);
 
 	if (sideButtons != null && sideButtons != undefined && sideButtons.length > 0) {
 		addStatistic("Likes", thingDetails["like_count"], likesIcon);
 		addStatistic("Collections", thingDetails["collect_count"], collectionsIcon);
 		addStatistic("Downloads", thingDetails["download_count"], downloadsIcon);
 	} else {
-		console.log("waiting for the sidebuttons because yay javascript is awesome and not slow and clunky at all.");
 		// give the page some more time to display the buttons...
 		setTimeout(() => { showThingDetails(thingDetails) }, 1000);
 	}
