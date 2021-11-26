@@ -5,7 +5,7 @@ chrome.webNavigation.onCompleted.addListener(function (details) {
 	if (details.frameId == 0) {
 		getThingIdFromUrl();
 	}
-});
+}, { url: [{ urlPrefix: "https://www.thingiverse.com/thing:" }] });
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	function (details) {
@@ -19,7 +19,8 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 getThingIdFromUrl = () => {
 	chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
 		let url = new URL(tabs[0].url);
-		let parts = url.pathname.split(":");
+		let dirs = url.pathname.split("/");
+		let parts = dirs[1].split(":");
 
 		thingId = parts[1];
 
