@@ -32,5 +32,7 @@
       "run_at": "document_end"
     }
   ],
-  "action": {}
+  "action": {
+    "default_popup": "thingStats.html"
+  }
 }
