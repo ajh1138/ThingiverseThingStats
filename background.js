@@ -36,9 +36,10 @@ getThingDetails = () => {
 			method: "get",
 			mode: "cors",
 			credentials: "include",
+			cache: "no-cache",
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": `${token}`
+				"Authorization": `${token}`,
 			}
 		})
 		.then(response => response.json())

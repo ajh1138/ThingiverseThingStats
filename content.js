@@ -7,14 +7,13 @@ let collectionsIcon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 window.onload = function () {
 	console.log("page is loaded, yo");
-
-	setTimeout(showThingDetails, 500);
 }
 
 chrome.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
 		if (request.details != "") {
 			thingDetails = request.details;
+			showThingDetails();
 		}
 
 		sendResponse({ farewell: "whatever" });
