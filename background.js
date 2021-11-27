@@ -1,21 +1,7 @@
-let token = "";
+let token = "201f5af321613bba4669214ec393d6de"; // this is a read-only token from Thingiverse.
 
 console.log("adding message listener...");
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { addMessageListener(request, sender, sendResponse) });
-
-chrome.webRequest.onBeforeSendHeaders.addListener(
-	function (details) {
-		if (token == "") {
-			let authArr = details.requestHeaders.filter(x => { return x.name == "Authorization" });
-
-			console.log("authArr", authArr);
-
-			if (authArr != null && authArr.length > 0) {
-				token = authArr[0]["value"];
-			}
-		}
-	}, { urls: ["*://api.thingiverse.com/things/*"], types: ["xmlhttprequest"] }, ["requestHeaders"]);
-
 
 const addMessageListener = (request, sender, sendResponse) => {
 	let thingId = request.thingId;
@@ -47,7 +33,7 @@ const sendThingDetailsToContentScript = (thingId) => {
 }
 
 const getThingDetails = async (thingId) => {
-	let url = `https://api.thingiverse.com/things/${thingId}`;
+	let url = `https://api.thingiverse.com/things/${thingId}?access_token=${token}`;
 	var ajaxResults;
 
 	await fetch(url,
@@ -58,7 +44,6 @@ const getThingDetails = async (thingId) => {
 			cache: "no-cache",
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": `${token}`,
 			}
 		})
 		.then(response => response.json())
