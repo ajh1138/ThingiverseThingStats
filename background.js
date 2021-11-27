@@ -1,18 +1,7 @@
 let token = "";
 
-chrome.runtime.onMessage.addListener(
-	function (request, sender, sendResponse) {
-		var thingId = request.thingId;
-
-		if (thingId != null && thingId != undefined && thingId != "") {
-			getThingDetails(thingId);
-			sendResponse({ farewell: "bg received the thingId" });
-		} else {
-			sendResponse({ farewell: "bg received something but it wasn't the thingId" });
-		}
-
-	}
-);
+console.log("adding message listener...");
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { addMessageListener(request, sender, sendResponse) });
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	function (details) {
@@ -24,11 +13,40 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 	}, { urls: ["*://api.thingiverse.com/things/*"], types: ["xmlhttprequest"] }, ["requestHeaders"]);
 
 
+const addMessageListener = (request, sender, sendResponse) => {
+	let thingId = request.thingId;
 
-getThingDetails = (thingId) => {
+	if (thingId != null && thingId != undefined && thingId != "") {
+		sendThingDetailsToContentScript(thingId);
+		sendResponse("thing id received by bg: ", thingId);
+		return true;
+	} else {
+		console.log("thing id not received.", request);
+		sendResponse({ farewell: "bg received something but it wasn't the thingId" });
+	}
+}
+
+const sendThingDetailsToContentScript = (thingId) => {
+	(async () => {
+		let details = await getThingDetails(thingId);
+
+		console.log("details fetch done:", details);
+
+		await chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+			console.log("tabs:", tabs);
+
+			chrome.tabs.sendMessage(tabs[0].id, details, function (response) {
+				console.log("response from content:", response)
+			});
+		});
+	})();
+}
+
+const getThingDetails = async (thingId) => {
 	let url = `https://api.thingiverse.com/things/${thingId}`;
+	var ajaxResults;
 
-	fetch(url,
+	await fetch(url,
 		{
 			method: "get",
 			mode: "cors",
@@ -41,14 +59,8 @@ getThingDetails = (thingId) => {
 		})
 		.then(response => response.json())
 		.then((response) => {
-			sendThingDetailsToContentScript(response);
+			ajaxResults = response;
 		});
-}
 
-sendThingDetailsToContentScript = (details) => {
-	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-		chrome.tabs.sendMessage(tabs[0].id, { details: details }, function (response) {
-			console.log(response.farewell);
-		});
-	});
+	return ajaxResults;
 }
