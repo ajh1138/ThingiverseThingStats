@@ -5,10 +5,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { addMes
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	function (details) {
-		let authArr = details.requestHeaders.filter(x => { return x.name == "Authorization" });
+		if (token == "") {
+			let authArr = details.requestHeaders.filter(x => { return x.name == "Authorization" });
 
-		if (authArr != null && authArr.length > 0) {
-			token = authArr[0]["value"];
+			console.log("authArr", authArr);
+
+			if (authArr != null && authArr.length > 0) {
+				token = authArr[0]["value"];
+			}
 		}
 	}, { urls: ["*://api.thingiverse.com/things/*"], types: ["xmlhttprequest"] }, ["requestHeaders"]);
 
