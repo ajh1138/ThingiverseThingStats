@@ -1,7 +1,9 @@
-let token = "201f5af321613bba4669214ec393d6de"; // this is a read-only token from Thingiverse.
+let token = "dd70494f3a74df20d2348d68517c3871"; // this is a read-only token from Thingiverse.
 
 console.log("adding message listener...");
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => { addMessageListener(request, sender, sendResponse) });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	addMessageListener(request, sender, sendResponse);
+});
 
 const addMessageListener = (request, sender, sendResponse) => {
 	let thingId = request.thingId;
@@ -14,7 +16,7 @@ const addMessageListener = (request, sender, sendResponse) => {
 		console.log("thing id not received.", request);
 		sendResponse({ farewell: "bg received something but it wasn't the thingId" });
 	}
-}
+};
 
 const sendThingDetailsToContentScript = (thingId) => {
 	(async () => {
@@ -26,30 +28,29 @@ const sendThingDetailsToContentScript = (thingId) => {
 			console.log("tabs:", tabs);
 
 			chrome.tabs.sendMessage(tabs[0].id, details, function (response) {
-				console.log("response from content:", response)
+				console.log("response from content:", response);
 			});
 		});
 	})();
-}
+};
 
 const getThingDetails = async (thingId) => {
 	let url = `https://api.thingiverse.com/things/${thingId}?access_token=${token}`;
 	var ajaxResults;
 
-	await fetch(url,
-		{
-			method: "get",
-			mode: "cors",
-			credentials: "include",
-			cache: "no-cache",
-			headers: {
-				"Content-Type": "application/json",
-			}
-		})
-		.then(response => response.json())
+	await fetch(url, {
+		method: "get",
+		mode: "cors",
+		credentials: "include",
+		cache: "no-cache",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	})
+		.then((response) => response.json())
 		.then((response) => {
 			ajaxResults = response;
 		});
 
 	return ajaxResults;
-}
+};
